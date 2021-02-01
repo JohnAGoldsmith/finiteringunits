@@ -6,6 +6,10 @@ This is a Qt 5 C++ program that provides a graphic representation of the units i
 Each picture corresponds to a "base" N, and we consider multiplication mod N. You can
 increment and decrement N with the ++ and -- buttons.
 
+It is very interesting to make N large, like more than 100. The symmetries that emerge
+are quite stunning.
+
+
 For any given base N, you see a set of dots. Each dot has coordinates (m,n), where
 m and n are less than N. m and n are "units" and, in particular, they are each other's
 inverse. So (m,n) = 1 mod N, for each dot that you see.

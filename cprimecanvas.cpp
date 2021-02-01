@@ -3,7 +3,11 @@
 #include <QPen>
 #include "math.h"
 #include "cprimecanvas.h"
+#include "dotpage.h"
+#include "mainwindow.h"
 #include "dot.h"
+
+QColor colorCode2qcolor (int colorcode);
 
 
 cPrimeCanvas::cPrimeCanvas(QWidget * parent ):QWidget(parent)
@@ -11,13 +15,29 @@ cPrimeCanvas::cPrimeCanvas(QWidget * parent ):QWidget(parent)
     // Roots the widget to the top left even if resized
     qDebug() << "Starting PrimeCanvas";
     setAttribute(Qt::WA_StaticContents);
-    dotPage.setBase(19);
-    margin = 5;
-    diameter = 10;
-    qDebug()  << "Ending PrimeCanvas " <<dotPage.Dots.size() ;
-
-
+    dotPage      = new cDotPage(5); //setBase(323);
+    margin       = 5;
+    diameter     = 10;
 };
+
+
+
+
+void cPrimeCanvas::changeBase(int newbase){
+    /*
+    for (int i = 0; i < myMainWindow->getDotPageCollection()->size();i++){
+        if (myMainWindow->getDotPageCollection()->at(i)->getBase() == newbase){
+            dotPage = myMainWindow->getDotPageCollection()->at(i);
+            return;
+        }
+    }
+   */
+    qDebug() << "ChangeBase in primecanvas; base: "<<getBase();
+    dotPage = new cDotPage(newbase);
+    update();
+
+}
+
 
 int cPrimeCanvas::abs2localX(int x){
    return (x - margin)/xunit;
@@ -38,9 +58,6 @@ void cPrimeCanvas::calculateYunit(){
     yunit = (height()-2*margin) / Base();
 }
 void cPrimeCanvas::paintEvent(QPaintEvent *event){
-
-    qDebug() << "Widget height" << height();
-
     calculateXunit();
     calculateYunit();
     if (xunit > yunit)
@@ -63,8 +80,9 @@ void cPrimeCanvas::paintEvent(QPaintEvent *event){
     cDot * pDot;
     //qDebug() << "PrimeCanvas: painting...number of dots" << dotPage.Dots.size();
     QList<cDot*>::iterator i;
-    for (int i = 0; i < dotPage.GetDots()->size(); i++){
-            pDot = dotPage.GetDots()->at(i);
+    for (int i = 0; i < dotPage->GetDots()->size(); i++){
+            pDot = dotPage->GetDots()->at(i);
+            Painter.setBrush(QBrush(colorCode2qcolor(pDot->getColorIndex())));
             Painter.drawEllipse(local2absX(pDot->x ), local2absY (pDot->y),diameter,diameter);
             //qDebug() << "x" << local2absX(pDot->x) << "y" << local2absY(pDot->y) << "xunit" << xunit << "yunit"<<yunit;
     }
@@ -75,10 +93,11 @@ void cPrimeCanvas::mousePressEvent(QMouseEvent *event )
     int distance;
     int xMouse = abs2localX(event->x());
     int yMouse = abs2localY(event->y());
-    int bestNumber, bestInverse;
-    for (int i = 0; i < dotPage.GetDots()->size(); i++){
-            cDot* pDot = dotPage.GetDots()->at(i);
-            distance = pow(pDot->Number - xMouse,2) + pow(pDot->Inverse - yMouse,2);
+    int bestNumber = -1;
+    int bestInverse = -1;
+    for (int i = 0; i < dotPage->GetDots()->size(); i++){
+            cDot* pDot = dotPage->GetDots()->at(i);
+            distance = int(pow(pDot->Number - xMouse,2) + pow(pDot->Inverse - yMouse,2));
             if (distance < bestdistance) {
                 bestdistance = distance;
                 bestNumber = pDot->Number;
@@ -89,4 +108,48 @@ void cPrimeCanvas::mousePressEvent(QMouseEvent *event )
 };
 void cPrimeCanvas::mouseReleaseEvent(QMouseEvent *event )
 {};
+
+QColor colorCode2qcolor (int colorcode)
+{
+        switch(colorcode)
+        {
+        case 0:  {
+             return QColor(0,0,0);}  // black
+        case 1: {
+            return QColor(0, 255, 0);}	//green
+        case 2: {
+            return QColor(0, 0, 255);}	// blue
+        case 3: {
+            return QColor(255, 255, 0);}	// yellow
+        case 4: {
+            return QColor(127, 255, 255);}	// light blue
+        case 5: {
+            return QColor(255, 127, 255);}	// violet
+        case 6: {
+            return QColor(255, 255, 127);}	//
+        case 7: {
+            return QColor(175, 175, 175);}	// gray
+        case 8: {
+            return QColor(100, 240, 240);}	// aqua
+        case 9: {
+            return QColor(240, 100, 240);}	// purple
+        case 10: {
+            return QColor(240, 240, 100);}	// sick yellow
+        case 11: {
+            return QColor(255, 175, 10);}	//
+        case 12: {
+            return QColor(255, 10, 175); }	//
+        case 13: {
+            return QColor(175, 10, 255); }	//
+        case 14: {
+            return QColor(175, 175, 10); }	//
+        case 15: {
+            return QColor(10, 175, 255); }	//
+        case 16: {
+            return QColor(10, 255, 175); }	//
+
+        default: {
+            return QColor(255, 255, 255);} // default is white
+        }
+}
 

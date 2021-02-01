@@ -11,9 +11,7 @@ cDot::cDot(int number, int  inverse, int order){
     //qDebug() << "cDot constructor "<< 1 << display()<< 2;
 }
 
-cDot::~cDot(){
 
-}
 QString cDot::display(){
     QString outstring;
     outstring = "x=" + QString::number(this->x) + " y=" + QString::number( this->y)

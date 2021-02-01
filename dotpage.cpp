@@ -5,40 +5,32 @@
 #include "dotpage.h"
 #include "dot.h"
 
-cDotPage::cDotPage()
-{
-}
 
 cDotPage::cDotPage (int base){
     Base = base;
-    //populatePage(Base);
+    populate(Base);
     qDebug() << "end of DotPage creation.";
 }
 
-cDotPage::~cDotPage()
-{
-    RemoveAll();
-    //if (OrderPopulation) delete OrderPopulation;
-}
 
-void cDotPage::setBase(int N)
+
+
+void cDotPage::populate(int N)
 {   Base = N;
-    qDebug() << "Enter DotPage::setBase" ;
     cDot* pDot;
     RemoveAll();
     int inverse, order;
     for (int i = 1; i <=N; i++){
-
         ComputeInverseAndOrder(i, inverse, order);
-        if (inverse > 0){
-            //qDebug() << 96 << "number "<<i << "inverse "<< inverse;
+        if (inverse > 0){  
             pDot = new cDot(i, inverse,order);
-            qDebug() << pDot->display();
+            pDot->setParent(this);
             Dots.append(pDot);
-        }
+        } 
     }
-   qDebug() << "End of SetBase, with this many dots" << this->Dots.size();
+   AssignColorIndexFromOrder();
 }
+
 void cDotPage::ComputeInverseAndOrder(int n, int& inverse, int& order)
 {
     for (int m = 1; m <= Base; m++){
@@ -47,7 +39,7 @@ void cDotPage::ComputeInverseAndOrder(int n, int& inverse, int& order)
        if (remainder == 1){
           inverse = m;
           order = int (z / Base);
-          qDebug() << "inverse: " << inverse << " order: " << order;
+          //qDebug() << "inverse: " << inverse << " order: " << order;
           return;
        }
        if (remainder == 00){
@@ -59,12 +51,6 @@ void cDotPage::ComputeInverseAndOrder(int n, int& inverse, int& order)
     inverse = -1;
     order = -1;
 }
-
-QList<cDot*>*	cDotPage::GetDots()
-{ return &Dots;
-}
-
-int cDotPage::getBase() {return Base;}
 
 void	cDotPage::RemoveAll()
 {
@@ -161,18 +147,20 @@ int compare (const void *x, const void *y)
         *Y = (int*) y;
     return (*X-*Y);
 }
-
+bool sortbyfirst (const QPair<int, int> &a,
+                   const QPair<int, int> &b)
+{
+  return (a.first < b.first);
+}
 bool sortbysecond (const QPair<int, int> &a,
                    const QPair<int, int> &b)
 {
-  return (a.second < b.second);
+  return (a.second > b.second);
 }
 void cDotPage::AssignColorIndexFromOrder()
 {
     QHash<int, int> orderCounter;
     cDot*   pDot;
-    int		order;
-    int		Number;
 
     for (int i = 0; i < size(); i++)
     {
@@ -182,71 +170,36 @@ void cDotPage::AssignColorIndexFromOrder()
             orderCounter[pDot->Order] = 0;
         }
         orderCounter[pDot->Order] += 1;
+        qDebug() << i << pDot->Number << pDot->Inverse << pDot->Order;
     }
     // count how often each Order occurs
-    QVector<int> countVector  ;
+    QList<QPair<int,int>>countList  ;
     QHashIterator<int, int> i(orderCounter);
     while (i.hasNext()) {
         i.next();
-        countVector.append(i.key()); // the "key"  is the order, the value is the count of them.
+        countList.append(QPair<int,int>(i.key(),i.value())); // the "key"  is the order, the value is the count of them.
+        //qDebug() << i.key() << "count " << i.value();
     }
+    std::sort(countList.begin(), countList.end(), sortbysecond);
+    /* Now they are sorted by how often each order occurs among the dots */
 
-    // invert these, to sort Orders by their frequency
-    QVector<QPair<int, int>> inverted;
-
-    // Populate the inverted list
-    for (auto k : orderCounter.keys()) {
-      inverted.append(QPair<int, int>(countVector[k], k));
+    QHash<int,int> order2colorcode;
+    for (int i = 0; i < countList.size(); i++){
+        //qDebug() << "A"<< i << "order"<< countList[i].first << "count"<< countList[i].second;
+        //countList[i].second = i;
+        //qDebug() << "A"<< i << "order"<< countList[i].first << "color index"<< countList[i].second;
+        order2colorcode[countList[i].first] = i;
     }
-
-    std::sort(inverted.begin(), inverted.end(), sortbysecond);
 
     for (int j = 0; j < size(); j++)
     {
         pDot = GetAt(j);
-        pDot->setColorIndex(inverted[0].second);
-    }
-/*        switch (MyOrder)
-        {
-        case 0:  {
-            pDot->SetColor(QColor(0,0,0)); break;} // black
-        case 1: {
-            *pColor = RGB(0, 255, 0); break;}	//green
-        case 2: {
-            *pColor = RGB(0, 0, 255); break;}	// blue
-        case 3: {
-            *pColor = RGB(255, 255, 0); break;}	// yellow
-        case 4: {
-            *pColor = RGB(127, 255, 255); break;}	// light blue
-        case 5: {
-            *pColor = RGB(255, 127, 255); break;}	// violet
-        case 6: {
-            *pColor = RGB(255, 255, 127); break;}	//
-        case 7: {
-            *pColor = RGB(175, 175, 175); break;}	// gray
-        case 8: {
-            *pColor = RGB(100, 240, 240); break;}	// aqua
-        case 9: {
-            *pColor = RGB(240, 100, 240); break;}	// purple
-        case 10: {
-            *pColor = RGB(240, 240, 100); break;}	// sick yellow
-        case 11: {
-            *pColor = RGB(255, 175, 10); break;}	//
-        case 12: {
-            *pColor = RGB(255, 10, 175); break;}	//
-        case 13: {
-            *pColor = RGB(175, 10, 255); break;}	//
-        case 14: {
-            *pColor = RGB(175, 175, 10); break;}	//
-        case 15: {
-            *pColor = RGB(10, 175, 255); break;}	//
-        case 16: {
-            *pColor = RGB(10, 255, 175); break;}	//
-
-        default: {
-            *pColor = RGB(255, 255, 255); break;} // default is white
+        //qDebug() << j << pDot->Number << "order" << pDot->Order << "color index" << pDot->ColorIndex;
+        if (pDot->getOrder() >= 0){
+          pDot->setColorIndex(order2colorcode[pDot->getOrder()]);
+          //qDebug() << "B" << "dot number" << pDot->Number << "order"<< pDot->Order << "color index" << pDot->ColorIndex;
         }
-*/
+    }
 
 
 

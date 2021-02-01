@@ -1,12 +1,13 @@
 #ifndef DOTPAGE_H
 #define DOTPAGE_H
 #include <QList>
-
+#include <QObject>
 class cDot;
 
 
-class cDotPage
-{
+class cDotPage: QObject
+{ Q_OBJECT
+
 public:
     QList<cDot*>                        Dots;
     int									Base; // modular base
@@ -16,15 +17,16 @@ public:
 
     cDotPage();
     cDotPage(int);
-    virtual                             ~cDotPage();
+    virtual ~cDotPage() {};
     //void								Serialize(CArchive&);
     //void								SendToFile (ofstream&);
     //void								ReadFromFile (ifstream&);
     //void								Display(CPaintDC* dc, QRect&, int Prime, int DotSize );
 public:
-    QList<cDot*>*                       GetDots();
-    int									getBase();
-    void								setBase(int);
+
+    QList<cDot*>*                       GetDots() {return &Dots;}
+    int									getBase() {return Base;}
+    void								populate(int);
     void								RemoveAll();
     int									size();
     cDot*								GetAt(int);
@@ -33,6 +35,9 @@ public:
     void								ComputeInverseAndOrder (int n, int & inverse, int & order);
     int									GetEulerPhi();
     void								SetEulerPhi(int);
+
 };
+
+
 
 #endif // DOTPAGE_H

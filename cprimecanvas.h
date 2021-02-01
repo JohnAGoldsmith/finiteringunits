@@ -6,25 +6,36 @@
 
 #include "dotpage.h"
 
+class MainWindow;
+
 class cPrimeCanvas : public QWidget
 {
     Q_OBJECT
 
-    cDotPage dotPage;
-    int margin;
-    int diameter; // size of dots themselves
-    int xunit;
-    int yunit;
+    cDotPage*   dotPage;
+    int         margin;
+    int         diameter; // size of dots themselves
+    int         xunit;
+    int         yunit;
+    MainWindow* myMainWindow;
 
 public:
     cPrimeCanvas(QWidget * parent = 0);
-    int Base() {return dotPage.getBase();}
-    void displayDotPage(cDotPage& dotPage); // remove this, not to be used.
-    cDotPage*   getDotPage() {return &dotPage;}
+    int Base() {return dotPage->getBase();}
+
+    cDotPage*   getDotPage() {return dotPage;}
+    int         getBase() {return dotPage->getBase();}
+    void        changeBase(int base);
+    void        setMainWindow (MainWindow* mainwindow) {myMainWindow = mainwindow;} //this should be in the constructor.
+    MainWindow* getMainWindow(){return myMainWindow;}
+
+
     protected:
     virtual void paintEvent (QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event ) override;
     void mouseReleaseEvent(QMouseEvent *event ) override;
+
+
 
     int abs2localX(int x);
     int abs2localY(int y);
@@ -36,6 +47,10 @@ public:
     int getYunit(){return yunit;}
     void setXunit(int d){xunit = d;}
     void setYunit(int d){yunit = d;}
+
+
 };
+
+
 
 #endif // CPRIMECANVAS_H

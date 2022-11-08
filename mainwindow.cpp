@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QToolBar *toolbar = addToolBar("main toolbar");
     QAction * incrementBase = toolbar->addAction("++");
-    incrementBase->setShortcut(tr("+"));
+    incrementBase->setShortcut(tr("="));
     connect(incrementBase, &QAction::triggered,this,&MainWindow::nextBase);
     QAction * decrementBase = toolbar->addAction("--");
     decrementBase->setShortcut(tr("-"));

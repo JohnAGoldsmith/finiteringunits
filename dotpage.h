@@ -9,9 +9,9 @@ class cDotPage: QObject
 { Q_OBJECT
 
 public:
-    QList<cDot*>                        Dots;
+    QList<cDot*>                        m_Dots;
     int									Base; // modular base
-    int*								OrderPopulation; // how many members there are of each order.
+    //int*								OrderPopulation; // how many members there are of each order.
     int									m_PhiOfBase;
 
 
@@ -24,7 +24,7 @@ public:
     //void								Display(CPaintDC* dc, QRect&, int Prime, int DotSize );
 public:
 
-    QList<cDot*>*                       GetDots() {return &Dots;}
+    QList<cDot*>*                       GetDots() {return &m_Dots;}
     int									getBase() {return Base;}
     void								populate(int);
     void								RemoveAll();

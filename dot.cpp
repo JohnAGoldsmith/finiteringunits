@@ -10,7 +10,9 @@ cDot::cDot(int number, int  inverse, int order){
     y = inverse;
     //qDebug() << "cDot constructor "<< 1 << display()<< 2;
 }
+cDot::~cDot(){
 
+}
 
 QString cDot::display(){
     QString outstring;

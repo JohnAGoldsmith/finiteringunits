@@ -1,6 +1,7 @@
 #include <QtWidgets>
 #include <QDebug>
 #include <QPen>
+#include <QVector>
 #include "math.h"
 #include "cprimecanvas.h"
 #include "dotpage.h"
@@ -13,11 +14,19 @@ QColor colorCode2qcolor (int colorcode);
 cPrimeCanvas::cPrimeCanvas(QWidget * parent ):QWidget(parent)
 {
     // Roots the widget to the top left even if resized
-    qDebug() << "Starting PrimeCanvas";
+    //qDebug() << "Starting PrimeCanvas";
     setAttribute(Qt::WA_StaticContents);
-    dotPage      = new cDotPage(5); //setBase(323);
+
     margin       = 5;
-    diameter     = 10;
+    diameter     = 20;
+    m_factors.reserve(2000);
+    m_factors.append( new QList<int> );
+    m_factors.append( new QList<int> );
+    m_factors.append( new QList<int> );
+    m_factors[1]->append(1);
+    m_factors[2]->append(2);
+    m_primes.append(2);
+    m_dotPage      = new cDotPage(3); //setBase(323);
 };
 
 
@@ -33,7 +42,8 @@ void cPrimeCanvas::changeBase(int newbase){
     }
    */
     qDebug() << "ChangeBase in primecanvas; base: "<<getBase();
-    dotPage = new cDotPage(newbase);
+    computeFactors(newbase);
+    m_dotPage = new cDotPage(newbase);
     update();
 
 }
@@ -80,8 +90,8 @@ void cPrimeCanvas::paintEvent(QPaintEvent *event){
     cDot * pDot;
     //qDebug() << "PrimeCanvas: painting...number of dots" << dotPage.Dots.size();
     QList<cDot*>::iterator i;
-    for (int i = 0; i < dotPage->GetDots()->size(); i++){
-            pDot = dotPage->GetDots()->at(i);
+    for (int i = 0; i < m_dotPage->GetDots()->size(); i++){
+            pDot = m_dotPage->GetDots()->at(i);
             Painter.setBrush(QBrush(colorCode2qcolor(pDot->getColorIndex())));
             Painter.drawEllipse(local2absX(pDot->x ), local2absY (pDot->y),diameter,diameter);
             //qDebug() << "x" << local2absX(pDot->x) << "y" << local2absY(pDot->y) << "xunit" << xunit << "yunit"<<yunit;
@@ -95,8 +105,8 @@ void cPrimeCanvas::mousePressEvent(QMouseEvent *event )
     int yMouse = abs2localY(event->y());
     int bestNumber = -1;
     int bestInverse = -1;
-    for (int i = 0; i < dotPage->GetDots()->size(); i++){
-            cDot* pDot = dotPage->GetDots()->at(i);
+    for (int i = 0; i < m_dotPage->GetDots()->size(); i++){
+            cDot* pDot = m_dotPage->GetDots()->at(i);
             distance = int(pow(pDot->Number - xMouse,2) + pow(pDot->Inverse - yMouse,2));
             if (distance < bestdistance) {
                 bestdistance = distance;
@@ -153,3 +163,29 @@ QColor colorCode2qcolor (int colorcode)
         }
 }
 
+void cPrimeCanvas::computeFactors(int upto_N){
+    if ( upto_N < 2){
+        return;
+    }
+    for (int  n = m_factors.size(); n <= upto_N; n++){
+        foreach (int p, m_primes){
+            if ( n < p * p ){               
+                m_primes.append(n);
+                QList<int> * newlist = new QList<int>;
+                newlist->append(n);
+                m_factors.append(newlist);
+                break;
+            }
+            if (n % p == 0){
+                QList<int> * newlist = new QList<int>;
+                newlist ->append (p);
+                newlist->append(*m_factors[n /  p] );
+                m_factors.append(newlist);
+                break;
+            }
+        }
+    }
+
+
+
+}

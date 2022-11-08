@@ -31,6 +31,7 @@ private:
     cPrimeCanvas *primeCanvas;
     QList<cDotPage*> DotPageCollection;
 
+
     QMenu Menu1;
     void  createMenus();
     void  maybeSaveDotPage();

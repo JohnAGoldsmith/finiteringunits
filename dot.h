@@ -24,7 +24,7 @@ public:
     cDot(int Number, int Inverse, int Order);
     //cDot(int Number, int Inverse, int Block, int ClosestCB);
     void SetClosestCornerBlock (int i );
-     virtual  ~cDot(){};
+     virtual  ~cDot();
     QString display();
 /*    void	Serialize(CArchive&);
     void	SendToFile(ofstream&);

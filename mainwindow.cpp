@@ -4,6 +4,7 @@
 #include <QAction>
 #include <QVBoxLayout>
 #include <QWidgetAction>
+#include <QLabel>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "cprimecanvas.h"
@@ -21,8 +22,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->primeCanvas = new cPrimeCanvas(this);
     primeCanvas->setMainWindow(this); // this should be in the previous line, the constructor;
-    //qDebug() <<"MainWindow; made primecanvas" <<
-    //primeCanvas->getDotPage()->Dots.size();
     setCentralWidget(primeCanvas);
 
 
@@ -34,7 +33,23 @@ MainWindow::MainWindow(QWidget *parent) :
     decrementBase->setShortcut(tr("-"));
     connect(decrementBase, &QAction::triggered,this,&MainWindow::previousBase);
 
+    m_line_edit_base = new QLineEdit();
+    m_line_edit_base->setText(QString::number(3));
+    QLabel * label1 = new QLabel(QString("Base"));
+    toolbar->addWidget(label1);
+    toolbar->addWidget(m_line_edit_base);
+    QLabel * label2 = new QLabel("Base factors");
+    m_line_edit_base_factors.setText("2");
+    toolbar->addWidget(label2);
+    toolbar->addWidget(&m_line_edit_base_factors);
 
+
+    QLabel * label3 = new QLabel("Base totient");
+    toolbar->addWidget(label3);
+    m_line_edit_base_totient.setText("1");
+
+
+    connect(m_line_edit_base, &QLineEdit::editingFinished, this, &MainWindow::set_new_base_from_line_edit);
 
 }
 
@@ -52,6 +67,15 @@ int MainWindow::getBase(){
 }
 void MainWindow::nextBase(){
     incrementBase(1);
+}
+void MainWindow::set_new_base(const QString & base){
+    primeCanvas->changeBase(base.toInt());
+}
+void MainWindow::set_new_base(int n){
+    primeCanvas->changeBase(n);
+}
+void MainWindow::set_new_base_from_line_edit( ){
+    primeCanvas->changeBase(m_line_edit_base->text().toInt());
 }
 void MainWindow::previousBase(){
     if (getBase() > 3){

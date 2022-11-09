@@ -44,6 +44,7 @@ void cPrimeCanvas::changeBase(int newbase){
     qDebug() << "ChangeBase in primecanvas; base: "<<getBase();
     computeFactors(newbase);
     m_dotPage = new cDotPage(newbase);
+    myMainWindow->m_line_edit_base->setText(QString::number(newbase));
     update();
 
 }

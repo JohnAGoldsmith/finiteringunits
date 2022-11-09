@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QMenu>
+#include <QLineEdit>
 #include "cprimecanvas.h"
 
 class cCanvasCollection;
@@ -23,6 +24,9 @@ public:
     QList<cDotPage*>*  getDotPageCollection() {return &DotPageCollection;}
     ~MainWindow();
 
+    QLineEdit * m_line_edit_base;
+    QLineEdit   m_line_edit_base_totient;
+    QLineEdit   m_line_edit_base_factors;
 private:
     Ui::MainWindow *ui;
     QPushButton *incrementButton;
@@ -30,6 +34,9 @@ private:
 
     cPrimeCanvas *primeCanvas;
     QList<cDotPage*> DotPageCollection;
+
+
+
 
 
     QMenu Menu1;
@@ -41,6 +48,9 @@ private slots:
     void incrementBase(int i);
     void nextBase();
     void previousBase();
+    void set_new_base(int);
+    void set_new_base(const QString &);
+    void set_new_base_from_line_edit( );
 
 };
 

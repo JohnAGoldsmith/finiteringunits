@@ -4,20 +4,18 @@
 #include <QDebug>
 #include "dotpage.h"
 #include "dot.h"
+#include "cprimecanvas.h"
+#include "mainwindow.h"
 
 
-int euler(int n){
 
-    return n;
-}
-
-cDotPage::cDotPage (int base){
+cDotPage::cDotPage (int base, cPrimeCanvas * canvas){
+    m_parent = canvas;
     m_base = base;
     populate(m_base);
-    qDebug() << "end of DotPage creation.";
-    m_PhiOfBase = euler(base);
+    //eqDebug() << "end of DotPage creation.";
+    m_PhiOfBase = m_parent->getMainWindow()->euler(base);
 }
-
 
 
 void cDotPage::populate(int N)

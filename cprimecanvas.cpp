@@ -11,18 +11,20 @@
 QColor colorCode2qcolor (int colorcode);
 
 
-cPrimeCanvas::cPrimeCanvas(MainWindow* main_window, QWidget * parent ):QWidget(parent)
+cPrimeCanvas::cPrimeCanvas(MainWindow* main_window , QWidget* parent ):QWidget(parent)
 {
     // Roots the widget to the top left even if resized
     //qDebug() << "Starting PrimeCanvas";
+    const int BASE = 2;
     setAttribute(Qt::WA_StaticContents);
+    m_main_window = main_window;
+    m_main_window->set_UI_base(BASE);
 
-    int BASE = 2;
     margin       = 5;
     diameter     = 20;
-    m_dotPage      = new cDotPage(BASE); //setBase(323);
-    myMainWindow = main_window;
-    myMainWindow->set_UI_base(BASE);
+    m_dotPage      = new cDotPage(BASE, this); //setBase(323);
+
+
 
 
  };
@@ -31,9 +33,9 @@ cPrimeCanvas::cPrimeCanvas(MainWindow* main_window, QWidget * parent ):QWidget(p
 
 
 void cPrimeCanvas::change_base(int newbase){
-    myMainWindow->compute_primes_and_factors(newbase+1);
-    m_dotPage = new cDotPage(newbase);
-    myMainWindow->set_UI_base(newbase);
+    m_main_window->compute_primes_and_factors(newbase+1);
+    m_dotPage = new cDotPage(newbase, this);
+    m_main_window->set_UI_base(newbase);
     // to do : either delete the old cDotPage, or keep it for later use.
     update();
 }

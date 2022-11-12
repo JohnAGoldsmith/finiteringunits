@@ -4,6 +4,7 @@
 #include <QObject>
 class cDot;
 
+class cPrimeCanvas;
 
 class cDotPage: QObject
 { Q_OBJECT
@@ -12,20 +13,19 @@ public:
     QList<cDot*>                        m_Dots;
     int									m_base; // modular base
     //int*								OrderPopulation; // how many members there are of each order.
-    int									m_PhiOfBase;
+    QString									m_PhiOfBase;
 
 
     cDotPage();
-    cDotPage(int);
+    cDotPage(int, cPrimeCanvas * parent = nullptr);
     virtual ~cDotPage() {};
-    //void								Serialize(CArchive&);
-    //void								SendToFile (ofstream&);
-    //void								ReadFromFile (ifstream&);
-    //void								Display(CPaintDC* dc, QRect&, int Prime, int DotSize );
+private:
+    cPrimeCanvas*                       m_parent;
 public:
 
     QList<cDot*>*                       GetDots() {return &m_Dots;}
     int									get_base() {return m_base;}
+    cPrimeCanvas*                           get_parent() {return m_parent;}
     void                                increment_base(int n = 1) {m_base += n;}
     void								populate(int);
     void								RemoveAll();

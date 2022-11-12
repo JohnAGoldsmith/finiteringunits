@@ -17,22 +17,22 @@ class cPrimeCanvas : public QWidget
     int                     diameter; // size of dots themselves
     int                     xunit;
     int                     yunit;
-    MainWindow*             myMainWindow;
+    MainWindow*             m_main_window;
     //QList<int>              m_primes;
     QVector<QList<int>*>    m_factors;
     int                     m_largest_integer_factored;
 
 
 public:
-    cPrimeCanvas(MainWindow*, QWidget * parent = 0);
+    cPrimeCanvas(MainWindow* main_window, QWidget * parent = nullptr); // when the second argument is absent, it should be freefloating widget.
     int         get_base() {return m_dotPage->get_base();}
     void        increment_base();
     void        decrement_base();
 
     cDotPage*   getDotPage() {return m_dotPage;}
     void        change_base(int base);
-    void        setMainWindow (MainWindow* mainwindow) {myMainWindow = mainwindow;} //this should be in the constructor.
-    MainWindow* getMainWindow(){return myMainWindow;}
+    void        setMainWindow (MainWindow* mainwindow) {m_main_window = mainwindow;} //this should be in the constructor.
+    MainWindow* getMainWindow(){return m_main_window;}
     void        compute_primes_and_factors(int upto_N);
     QList<int> * get_factors(int n) {return m_factors[n]; }
     int         get_largest_integer_factored();

@@ -26,7 +26,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-     QList<cDotPage*>*  getDotPageCollection() {return &DotPageCollection;}
+     QList<cDotPage*>*  getDotPageCollection() {return &m_dot_page_collection;}
      int  get_UI_base() {return QLedit1->text().toInt();}
      void set_UI_base(int newbase);
      void increment_UI_base(int n = 1);
@@ -35,10 +35,12 @@ public:
      QList<int> * get_factors(int n) {return m_factors[n]; }
      int         get_largest_integer_factored();
      int         get_largest_prime() {return m_primes.back();}
+     QString    euler(int);
 private:
 
-    cPrimeCanvas *      m_primeCanvas;
-    QList<cDotPage*> DotPageCollection;
+    cPrimeCanvas *      m_active_prime_canvas;
+    QList<cDotPage*>    m_dot_page_collection;
+    QList<cPrimeCanvas*> m_prime_canvas_collection;
     void createMenu();
     void createHorizontalGroupBox();
     void createGridGroupBox();
@@ -59,7 +61,7 @@ private:
 
 
     QVBoxLayout *m_mainLayout;
-    cPrimeCanvas* getPrimeCanvas() {return m_primeCanvas;}
+    cPrimeCanvas* getPrimeCanvas() {return m_active_prime_canvas;}
 
 
     QLineEdit * QLedit1;// this is Base??

@@ -1,10 +1,12 @@
 #include <QDebug>
+#include <algorithm>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget * parent)
     : QMainWindow(parent)     
 {
+    m_largest_integer_factored = 1;
     createMenu();
     createHorizontalGroupBox();
     createGridGroupBox();
@@ -20,16 +22,20 @@ MainWindow::MainWindow(QWidget *parent)
     m_mainLayout->addWidget(formGroupBox);
     //m_mainLayout->addWidget(bigEditor);
 
-
-    m_primeCanvas = new cPrimeCanvas(this);
-    m_mainLayout->addWidget(m_primeCanvas);
+    m_active_prime_canvas = new cPrimeCanvas(this);// if it has no parent, it should live separately on the screen.
+    m_active_prime_canvas->show();
+    m_active_prime_canvas->move(0,this->height());
+    //m_active_prime_canvas = new cPrimeCanvas(this, this);// if it has no parent, it should live separately on the screen.
+    m_prime_canvas_collection.append(m_active_prime_canvas);
+    //m_mainLayout->addWidget(m_active_prime_canvas);
     QWidget *widget = new QWidget();
     widget->setLayout(m_mainLayout);
     setCentralWidget(widget);
 
-    connect(QLedit1, &QLineEdit::editingFinished, this, &MainWindow::set_new_base_from_line_edit);
-    connect(m_increment_base_button, &QPushButton::clicked, this, &MainWindow::incrementBase);
 
+    connect(m_increment_base_button, &QPushButton::clicked, this, &MainWindow::incrementBase);
+    connect(QLedit2, &QLineEdit::editingFinished, this, &MainWindow::set_new_base_from_line_edit);
+    connect(m_increment_base_button, &QPushButton::clicked, this, &MainWindow::incrementBase);
     connect(m_decrement_base_button, &QPushButton::clicked, this, &MainWindow::decrement_base);
 
 }
@@ -54,24 +60,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::incrementBase(){
     //maybeSaveDotPage();
-    m_primeCanvas->increment_base();
+    m_active_prime_canvas->increment_base();
 }
 void MainWindow::decrement_base(){
     //maybeSaveDotPage();
-    m_primeCanvas->decrement_base();
+    m_active_prime_canvas->decrement_base();
 }
 void MainWindow::nextBase(){
     incrementBase();
 }
 void MainWindow::set_new_base(const QString & base){
-    m_primeCanvas->change_base(base.toInt());
+    m_active_prime_canvas->change_base(base.toInt());
 }
 void MainWindow::set_new_base(int n){
-    m_primeCanvas->change_base(n);
+    m_active_prime_canvas->change_base(n);
 }
 void MainWindow::previousBase(){
-    if (m_primeCanvas->get_base() > 3){
-       m_primeCanvas->decrement_base();
+    if (m_active_prime_canvas->get_base() > 3){
+       m_active_prime_canvas->decrement_base();
     }
 }
 void MainWindow::set_UI_base(int newbase){
@@ -95,10 +101,12 @@ void MainWindow::set_UI_base(int newbase){
     }
     QLedit6->setText(factors.join(" "));
 
+    QLedit8->setText(euler(newbase));
+
 
 }
 void MainWindow::set_new_base_from_line_edit( ){
-    m_primeCanvas->change_base(get_UI_base());
+    m_active_prime_canvas->change_base(get_UI_base());
 }
 
 void MainWindow::createMenu()
@@ -115,11 +123,16 @@ void MainWindow::createMenu()
 void MainWindow::createHorizontalGroupBox()
 {
     m_horizontalGroupBox = new QGroupBox("Horizontal layout");
+    m_horizontalGroupBox->setMaximumHeight(140);
     QHBoxLayout *layout = new QHBoxLayout;
     m_increment_base_button = new QPushButton ("++");
     m_decrement_base_button = new QPushButton ("--");
     QLabel * label = new QLabel("Base:");
     m_base_line_edit = new QLineEdit();
+    m_increment_base_button->setMaximumWidth(50);
+    m_decrement_base_button->setMaximumWidth(50);
+    m_base_line_edit->setMaximumWidth(50);
+
     layout->addWidget(m_increment_base_button);
     layout->addWidget(m_decrement_base_button);
     layout->addWidget(label);
@@ -127,9 +140,15 @@ void MainWindow::createHorizontalGroupBox()
     m_horizontalGroupBox->setLayout(layout);
 }
 
+
+
+
+
+
 void MainWindow::createGridGroupBox()
 {
     gridGroupBox = new QGroupBox(tr("Grid layout"));
+    gridGroupBox->setMaximumHeight(200);
     QGridLayout *layout = new QGridLayout;
 
     QLabel * label1 = new QLabel ("Base - 1");
@@ -183,19 +202,20 @@ void MainWindow::createFormGroupBox()
     layout->addRow(new QLabel(tr("Line 2, long text:")), new QComboBox);
     layout->addRow(new QLabel(tr("Line 3:")), new QSpinBox);
     formGroupBox->setLayout(layout);
+    formGroupBox->setVisible(false);
 }
 
 void MainWindow::compute_primes_and_factors(int upto_N){
     if ( upto_N < m_largest_integer_factored){
         return;
     }
-    qDebug() << "->" << upto_N << "largest factored" << m_largest_integer_factored;
+    //qDebug() << "->" << upto_N << "largest factored" << m_largest_integer_factored;
     for (int  n = m_largest_integer_factored + 1; n <= upto_N+1; n++){
         foreach (int p, m_primes){
-            qDebug() << "n" << n << "p" << p;
+            //qDebug() << "n" << n << "p" << p;
             if ( n < p * p ){
                 m_primes.append(n);
-                qDebug() << "  " << n << "is prime.";
+                //qDebug() << "  " << n << "is prime.";
                 QList<int> * newlist = new QList<int>;
                 newlist->append(n);
                 m_factors.append(newlist);
@@ -203,16 +223,38 @@ void MainWindow::compute_primes_and_factors(int upto_N){
             }
             if (n % p == 0){
                 QList<int> * newlist = new QList<int>;
-                qDebug() << "  " << p << " is a divider";
+                //qDebug() << "  " << p << " is a divider";
                 newlist ->append (p);
                 newlist->append(*m_factors[n /  p] );
-                qDebug() << "   " << n << p << n/p << "other factors are" << *m_factors[n/p];
+                //qDebug() << "   " << n << p << n/p << "other factors are" << *m_factors[n/p];
                 m_factors.append(newlist);
                 break;
             }
         }
     }
     m_largest_integer_factored = upto_N + 1;
-    qDebug() << "end";
+    //qDebug() << "end";
 
+}
+QString MainWindow::euler(int n){
+
+    QList<int> result;
+    int previous_factor = 0;
+    compute_primes_and_factors(n);
+    for (int i = 0; i < m_factors[n]->length(); i++){
+        int this_factor = m_factors[n]->at(i);
+        if (this_factor != previous_factor){
+            if (this_factor == 2){ continue;}
+            QList<int> * new_factors = m_factors[this_factor - 1];
+            result.append(*new_factors);
+        } else{
+            result.append( this_factor );
+        }
+    }
+    std::sort(result.begin(), result.end());
+    QString output;
+    foreach (int i, result){
+        output += QString::number(i) + " ";
+    }
+    return output.trimmed();
 }

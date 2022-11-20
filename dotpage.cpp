@@ -8,7 +8,9 @@
 #include "mainwindow.h"
 
 
-
+cDotPage::cDotPage(){
+    m_base = -1;
+}
 cDotPage::cDotPage (int base, cPrimeCanvas * canvas){
     m_parent = canvas;
     m_base = base;

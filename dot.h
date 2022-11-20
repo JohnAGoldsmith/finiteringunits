@@ -4,6 +4,7 @@
 
 #include <QObject>
 #include <QColor>
+#include <QString>
 
 class cDot : public QObject
 {    Q_OBJECT

@@ -11,6 +11,7 @@
 #include <QFormLayout>
 #include <QComboBox>
 #include <QSpinBox>
+#include <QString>
 #include "cprimecanvas.h"
 
 class cDotPage;

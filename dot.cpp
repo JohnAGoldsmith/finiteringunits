@@ -2,6 +2,13 @@
 #include <QDebug>
 #include "dot.h"
 
+cDot::cDot(){
+    Number = -1;
+    Inverse = -1;
+    Order = -1;
+    x = -1;
+    y = -1;
+}
 cDot::cDot(int number, int  inverse, int order){
     Number = number;
     Inverse = inverse;

@@ -13,8 +13,7 @@ QColor colorCode2qcolor (int colorcode);
 
 cPrimeCanvas::cPrimeCanvas(MainWindow* main_window , QWidget* parent ):QWidget(parent)
 {
-    // Roots the widget to the top left even if resized
-    //qDebug() << "Starting PrimeCanvas";
+
     const int BASE = 2;
     setAttribute(Qt::WA_StaticContents);
     m_main_window = main_window;
@@ -24,7 +23,7 @@ cPrimeCanvas::cPrimeCanvas(MainWindow* main_window , QWidget* parent ):QWidget(p
     diameter     = 20;
     m_dotPage      = new cDotPage(BASE, this); //setBase(323);
 
-
+    setStyleSheet("background-color:yellow;");
 
 
  };
@@ -99,8 +98,8 @@ void cPrimeCanvas::mousePressEvent(QMouseEvent *event )
 {
     int bestdistance = 64000;
     int distance;
-    int xMouse = abs2localX(event->x());
-    int yMouse = abs2localY(event->y());
+    int xMouse = abs2localX(event->position().x());
+    int yMouse = abs2localY(event->position().y());
     int bestNumber = -1;
     int bestInverse = -1;
     for (int i = 0; i < m_dotPage->GetDots()->size(); i++){
